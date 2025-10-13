@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marathi Autofill Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-color: #f8f9fc;
+            --card-bg: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --primary-color: #667eea;
+            --primary-hover: #5a67d8;
+            --border-color: #e2e8f0;
+            --input-bg: #f7fafc;
+            --button-bg: #edf2f7;
+            --button-hover: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-devanagari: 'Noto Sans Devanagari', sans-serif;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            font-family: var(--font-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 48px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--bg-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            padding: 6px;
+            background: var(--input-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-link {
+            flex: 1;
+            max-width: 200px;
+            text-align: center;
+            padding: 12px 24px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-radius: 8px;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .textarea-wrapper {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .textarea-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #text-area {
+            width: 100%;
+            height: 240px;
+            font-size: 1.375rem;
+            font-family: var(--font-devanagari);
+            padding: 18px;
+            padding-bottom: 50px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            resize: vertical;
+            transition: var(--transition);
+            line-height: 1.6;
+        }
+
+        #text-area:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background-color: white;
+        }
+
+        #text-area::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .flash {
+            animation: flashAnimation 0.5s ease;
+        }
+
+        @keyframes flashAnimation {
+            0%, 100% { 
+                background-color: var(--input-bg); 
+            }
+            50% { 
+                background-color: rgba(102, 126, 234, 0.15); 
+            }
+        }
+
+        #clear-btn {
+            position: absolute;
+            top: 44px;
+            right: 14px;
+            background: white;
+            border: 1px solid var(--border-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        #clear-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        #clear-btn:active {
+            transform: scale(0.95);
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 18px;
+            left: 18px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .suggestions-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        #suggestion-box {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            min-height: 60px;
+            flex-wrap: wrap;
+        }
+
+        .suggestion-btn {
+            background: var(--button-bg);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 1.125rem;
+            font-family: var(--font-devanagari);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: 140px;
+            max-width: 220px;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .suggestion-btn:empty {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .suggestion-btn:not(:empty):hover {
+            background: var(--button-hover);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .suggestion-btn.highlighted:not(:empty) {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .suggestion-btn:active {
+            transform: translateY(0);
+        }
+
+        .keyboard-hint {
+            text-align: center;
+            margin-top: 24px;
+            padding: 16px;
+            background: var(--input-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .keyboard-hint-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .keyboard-shortcuts {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .shortcut {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .key {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        @media (max-width: 767px) {
+            .container {
+                padding: 32px 24px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            #text-area {
+                height: 200px;
+                font-size: 1.25rem;
+            }
+
+            .suggestion-btn {
+                font-size: 1rem;
+                padding: 10px 18px;
+                min-width: 110px;
+            }
+
+            .keyboard-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Marathi Autofill Tool </h1>
+            <p class="subtitle">Type in Marathi and get smart word suggestions instantly</p>
+        </div>
+
+        <nav class="nav">
+            <a href="/" class="nav-link active">Autofill</a>
+            <a href="/translator" class="nav-link">Translator</a>
+        </nav>
+
+        <div class="textarea-wrapper">
+            <label class="textarea-label">Type in Marathi</label>
+            <textarea id="text-area" placeholder="येथे टाइप करा..." spellcheck="false"></textarea>
+            <button id="clear-btn" title="Clear Text" aria-label="Clear text">×</button>
+            <span id="char-count" class="char-count">0 characters</span>
+        </div>
+        
+        <div class="suggestions-label">Word Suggestions</div>
+        <div id="suggestion-box">
+            <button id="btn-0" class="suggestion-btn"></button>
+            <button id="btn-1" class="suggestion-btn"></button>
+            <button id="btn-2" class="suggestion-btn"></button>
+        </div>
+
+        <div class="keyboard-hint">
+            <div class="keyboard-hint-title">Keyboard Shortcuts</div>
+            <div class="keyboard-shortcuts">
+                <span class="shortcut">
+                    <span class="key">↑</span>
+                    <span class="key">↓</span>
+                    <span>Navigate</span>
+                </span>
+                <span class="shortcut">
+                    <span class="key">Enter</span>
+                    <span>Select</span>
+                </span>
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const textArea = document.getElementById('text-area');
+        const clearBtn = document.getElementById('clear-btn');
+        const charCount = document.getElementById('char-count');
+        const suggestionButtons = [
+            document.getElementById('btn-0'),
+            document.getElementById('btn-1'),
+            document.getElementById('btn-2')
+        ];
+        
+        let selectedIndex = -1;
+        let debounceTimer;
+        const DEBOUNCE_DELAY = 200;
+
+        function updateCharCount() {
+            const count = textArea.value.length;
+            charCount.textContent = `${count} character${count !== 1 ? 's' : ''}`;
+        }
+
+        async function fetchSuggestions() {
+            const text = textArea.value.trim();
+            
+            if (!text) {
+                clearSuggestions();
+                return;
+            }
+
+            try {
+                const response = await fetch('/suggest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                if (!response.ok) throw new Error('Suggestion fetch failed');
+                
+                const suggestions = await response.json();
+                updateSuggestions(suggestions);
+            } catch (error) {
+                console.error('Error fetching suggestions:', error);
+                clearSuggestions();
+            }
+        }
+
+        function updateSuggestions(suggestions) {
+            clearSuggestions();
+            suggestions.forEach((word, index) => {
+                if (index < suggestionButtons.length && word) {
+                    suggestionButtons[index].textContent = word;
+                }
+            });
+        }
+        
+        function clearSuggestions() {
+            suggestionButtons.forEach(btn => { 
+                btn.textContent = '';
+                btn.classList.remove('highlighted');
+            });
+            selectedIndex = -1;
+        }
+        
+        function useSuggestion(index) {
+            const word = suggestionButtons[index].textContent;
+            if (!word) return;
+
+            const currentText = textArea.value;
+            const lastSpaceIndex = currentText.lastIndexOf(' ');
+            const baseText = lastSpaceIndex === -1 ? '' : currentText.substring(0, lastSpaceIndex + 1);
+            
+            textArea.value = baseText + word + ' ';
+            updateCharCount();
+
+            textArea.classList.add('flash');
+            setTimeout(() => textArea.classList.remove('flash'), 500);
+
+            textArea.focus();
+            
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(fetchSuggestions, DEBOUNCE_DELAY);
+        }
+        
+        function highlightSuggestion(index) {
+            suggestionButtons.forEach((btn, i) => {
+                btn.classList.toggle('highlighted', i === index);
+            });
+        }
+
+        textArea.addEventListener('input', () => {
+            clearBtn.style.display = textArea.value.length > 0 ? 'block' : 'none';
+            updateCharCount();
+            
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(fetchSuggestions, DEBOUNCE_DELAY);
+        });
+
+        clearBtn.addEventListener('click', () => {
+            textArea.value = '';
+            clearSuggestions();
+            updateCharCount();
+            textArea.focus();
+            clearBtn.style.display = 'none';
+        });
+
+        textArea.addEventListener('keydown', (e) => {
+            const hasSuggestions = suggestionButtons.some(btn => btn.textContent !== '');
+            
+            if (!hasSuggestions) return;
+
+            switch(e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    selectedIndex = (selectedIndex + 1) % 3;
+                    highlightSuggestion(selectedIndex);
+                    break;
+                
+                case 'ArrowUp':
+                    e.preventDefault();
+                    selectedIndex = (selectedIndex - 1 + 3) % 3;
+                    highlightSuggestion(selectedIndex);
+                    break;
+                
+                case 'Enter':
+                case 'Tab':
+                    if (selectedIndex !== -1) {
+                        e.preventDefault();
+                        useSuggestion(selectedIndex);
+                    }
+                    break;
+                
+                case 'Escape':
+                    e.preventDefault();
+                    clearSuggestions();
+                    break;
+            }
+        });
+
+        suggestionButtons.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                if (btn.textContent) {
+                    useSuggestion(index);
+                }
+            });
+        });
+
+        updateCharCount();
+    </script>
+</body>
+</html>

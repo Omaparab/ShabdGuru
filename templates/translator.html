@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marathi Transliteration Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-color: #f8f9fc;
+            --card-bg: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --primary-color: #667eea;
+            --primary-hover: #5a67d8;
+            --border-color: #e2e8f0;
+            --input-bg: #f7fafc;
+            --output-bg: #edf2f7;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --success-color: #48bb78;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-devanagari: 'Noto Sans Devanagari', sans-serif;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            font-family: var(--font-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 48px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--bg-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            padding: 6px;
+            background: var(--input-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-link {
+            flex: 1;
+            max-width: 200px;
+            text-align: center;
+            padding: 12px 24px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-radius: 8px;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .translator-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 768px) {
+            .translator-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .textarea-wrapper {
+            position: relative;
+        }
+
+        .textarea-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 220px;
+            font-size: 1.25rem;
+            font-family: var(--font-devanagari);
+            padding: 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            resize: vertical;
+            transition: var(--transition);
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background-color: white;
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        #output-area {
+            background-color: var(--output-bg);
+            font-weight: 500;
+        }
+
+        .action-btn {
+            position: absolute;
+            top: 44px;
+            right: 14px;
+            background: white;
+            border: 1px solid var(--border-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .action-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .copy-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .copy-feedback {
+            position: absolute;
+            bottom: 18px;
+            right: 18px;
+            background: var(--success-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+        }
+
+        .copy-feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 18px;
+            left: 18px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        @media (max-width: 767px) {
+            .container {
+                padding: 32px 24px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            textarea {
+                height: 180px;
+                font-size: 1.125rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Marathi Transliteration Tool </h1>
+            <p class="subtitle">Type in English and see it instantly in Marathi Devanagari</p>
+        </div>
+
+        <nav class="nav">
+            <a href="/" class="nav-link">Autofill</a>
+            <a href="/translator" class="nav-link active">Translator</a>
+        </nav>
+
+        <div class="translator-grid">
+            <div class="textarea-wrapper">
+                <label class="textarea-label">English (Roman)</label>
+                <textarea id="input-area" placeholder="Type: mala bhook lagli" spellcheck="false"></textarea>
+                <button id="clear-btn" class="action-btn" title="Clear Text" aria-label="Clear text">×</button>
+                <span id="input-count" class="char-count">0 characters</span>
+            </div>
+            
+            <div class="textarea-wrapper">
+                <label class="textarea-label">Marathi (Devanagari)</label>
+                <textarea id="output-area" readonly placeholder="Result: मला भूक लागली"></textarea>
+                <button id="copy-btn" class="action-btn copy-btn" title="Copy Text" aria-label="Copy text">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                </button>
+                <div id="copy-feedback" class="copy-feedback">Copied!</div>
+                <span id="output-count" class="char-count">0 characters</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputArea = document.getElementById('input-area');
+        const outputArea = document.getElementById('output-area');
+        const clearBtn = document.getElementById('clear-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyFeedback = document.getElementById('copy-feedback');
+        const inputCount = document.getElementById('input-count');
+        const outputCount = document.getElementById('output-count');
+
+        let debounceTimer;
+        const DEBOUNCE_DELAY = 150;
+
+        function updateCharCount(element, countElement) {
+            const count = element.value.length;
+            countElement.textContent = `${count} character${count !== 1 ? 's' : ''}`;
+        }
+
+        async function doTransliterate() {
+            const engText = inputArea.value.trim();
+            
+            if (!engText) {
+                outputArea.value = '';
+                updateCharCount(outputArea, outputCount);
+                return;
+            }
+
+            try {
+                const response = await fetch('/transliterate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: engText })
+                });
+
+                if (!response.ok) throw new Error('Translation failed');
+                
+                const data = await response.json();
+                outputArea.value = data.marathi_text || '';
+                updateCharCount(outputArea, outputCount);
+            } catch (error) {
+                console.error('Error during transliteration:', error);
+                outputArea.value = 'Translation error. Please try again.';
+            }
+        }
+
+        function toggleButtons() {
+            const hasText = inputArea.value.length > 0;
+            clearBtn.style.display = hasText ? 'flex' : 'none';
+            copyBtn.style.display = outputArea.value.length > 0 ? 'flex' : 'none';
+        }
+
+        inputArea.addEventListener('input', () => {
+            toggleButtons();
+            updateCharCount(inputArea, inputCount);
+            
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(doTransliterate, DEBOUNCE_DELAY);
+        });
+
+        clearBtn.addEventListener('click', () => {
+            inputArea.value = '';
+            outputArea.value = '';
+            updateCharCount(inputArea, inputCount);
+            updateCharCount(outputArea, outputCount);
+            toggleButtons();
+            inputArea.focus();
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(outputArea.value);
+                copyFeedback.classList.add('show');
+                setTimeout(() => copyFeedback.classList.remove('show'), 2000);
+            } catch (err) {
+                outputArea.select();
+                document.execCommand('copy');
+                copyFeedback.classList.add('show');
+                setTimeout(() => copyFeedback.classList.remove('show'), 2000);
+            }
+        });
+
+        inputArea.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'k') {
+                e.preventDefault();
+                clearBtn.click();
+            }
+        });
+
+        updateCharCount(inputArea, inputCount);
+        updateCharCount(outputArea, outputCount);
+    </script>
+</body>
+</html>
