@@ -6,3 +6,5 @@ example
 मी बरा नाही should predict next word आहे
 by understanding that बरा is related to health . 
 Thus it should use dictionary to relate बरा with आजारी 
+
+other possibility is to use cosine similarity.
